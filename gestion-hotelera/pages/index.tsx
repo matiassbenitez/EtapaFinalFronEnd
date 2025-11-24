@@ -10,7 +10,7 @@ const HomePage = () => {
       <Link href="/facturar" className="w-100 text-center my-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition">Facturar</Link>
       {/* <Link href="/huesped/dar-de-baja" className="w-100 text-center my-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition">Dar de baja huésped</Link> */}
       <Link href="/huesped/buscar" className="w-100 text-center my-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition">Buscar huésped</Link>
-
+      <Link href="/huesped/1" className="w-100 text-center my-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition">Ver Huesped</Link>
     </div>
   );
 }

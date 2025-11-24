@@ -1,0 +1,72 @@
+export const MOCK_RESERVAS = [
+  {
+    id: 1001,
+    nombre: "Ana",
+    apellido: "Gómez",
+    fecha: "2025-12-15T10:00:00Z", // Formato ISO 8601
+    estado: "Confirmada",
+  },
+  {
+    id: 1002,
+    nombre: "Carlos",
+    apellido: "Rodríguez",
+    fecha: "2025-11-28T14:30:00Z",
+    estado: "Pendiente",
+  },
+  {
+    id: 1003,
+    nombre: "Laura",
+    apellido: "Fernández",
+    fecha: "2026-01-05T09:00:00Z",
+    estado: "Confirmada",
+  },
+  {
+    id: 1004,
+    nombre: "Jorge",
+    apellido: "Pérez",
+    fecha: "2025-12-01T18:00:00Z",
+    estado: "Cancelada",
+  },
+  {
+    id: 1005,
+    nombre: "María",
+    apellido: "López",
+    fecha: "2025-12-24T20:30:00Z",
+    estado: "Confirmada",
+  },
+  {
+    id: 1006,
+    nombre: "Pablo",
+    apellido: "Martínez",
+    fecha: "2026-02-10T11:00:00Z",
+    estado: "Confirmada",
+  },
+  {
+    id: 1007,
+    nombre: "Sofía",
+    apellido: "Díaz",
+    fecha: "2025-11-25T16:45:00Z",
+    estado: "Pendiente",
+  },
+  {
+    id: 1008,
+    nombre: "Ricardo",
+    apellido: "Sánchez",
+    fecha: "2026-03-01T13:15:00Z",
+    estado: "Confirmada",
+  },
+  {
+    id: 1009,
+    nombre: "Elena",
+    apellido: "Torres",
+    fecha: "2025-12-05T07:30:00Z",
+    estado: "Cancelada",
+  },
+  {
+    id: 1010,
+    nombre: "Fernando",
+    apellido: "Ruiz",
+    fecha: "2026-01-20T19:00:00Z",
+    estado: "Confirmada",
+  },
+];
