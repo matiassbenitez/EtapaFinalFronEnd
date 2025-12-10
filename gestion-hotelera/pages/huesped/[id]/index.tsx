@@ -3,13 +3,6 @@ import React, {useState, useEffect} from "react";
 
 
 interface HuespedData {
-  // nombre: string;
-  // apellido: string;
-  // tipoDoc: string;
-  // nroDoc: string;
-  // email: string;
-  // telefono: string;
-
   id: number,
     posIva: string,
     nacionalidad: string,
@@ -58,14 +51,6 @@ function Huesped () {
         setLoading(false);
       }
     };
-    // setHuesped({
-    //   nombre: "Juan",
-    //   apellido: "Pérez",
-    //   tipoDoc: "DNI",
-    //   nroDoc: "12345678",
-    //   email: "email@email.com",
-    //   telefono: "1234567890"
-    // });
     setLoading(false);
 
 
@@ -104,7 +89,9 @@ function Huesped () {
     <button 
       className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out"
       onClick={() => 
-        {/* Lógica de edición */}
+        {
+          router.push(`/huesped/${id}/modificar`);
+        }
       }
     >
       Editar Huésped

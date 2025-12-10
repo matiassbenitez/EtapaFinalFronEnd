@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from 'next/link';
+import Link from 'next/link';
 
 
 interface Huesped {
@@ -36,7 +36,14 @@ const HuespedSearchPage = () => {
     e.preventDefault();
     setLoading(true);
     const baseURL = "http://localhost:8080/api/huesped";
-    const params = new URLSearchParams(formData).toString();
+    const filteredFormData = Object.keys(formData).reduce((acc, key) => {
+        // Excluir si el valor es una cadena vacía
+        if (formData[key] !== "") {
+            acc[key] = formData[key];
+        }
+        return acc;
+    }, {});
+    const params = new URLSearchParams(filteredFormData).toString();
     // const baseURL = "http://localhost:8080/api/huesped"
     try {
     const response = await fetch(`${baseURL}?${params}`, {
@@ -46,6 +53,7 @@ const HuespedSearchPage = () => {
         "Content-Type": "application/json",
       },
     });
+    console.log("Respuesta de la API:", response);
     if (!response.ok) {
       throw new Error(`Error en la API: ${response.status}`);
     }
@@ -59,159 +67,6 @@ const HuespedSearchPage = () => {
     } finally {
     setLoading(false);
     }
-
-    // const dataFalsa = [
-    //   {
-    //     id: 1,
-    //     nombre: "María",
-    //     apellido: "Perez_Nro_1",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456701"
-    //   },
-    //   {
-    //     id: 2,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_2",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456702"
-    //   },
-    //   {
-    //     id: 3,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_3",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456703"
-    //   },
-    //   {
-    //     id: 4,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_4",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456704"
-    //   },
-    //   {
-    //     id: 5,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_5",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456705"
-    //   },
-    //   {
-    //     id: 6,
-    //     nombre: "María",
-    //     apellido: "Perez_Nro_6",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456706"
-    //   },
-    //   {
-    //     id: 7,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_7",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456707"
-    //   },
-    //   {
-    //     id: 8,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_8",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456708"
-    //   },
-    //   {
-    //     id: 9,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_9",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456709"
-    //   },
-    //   {
-    //     id: 10,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_10",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456710"
-    //   },
-    //   {
-    //     id: 11,
-    //     nombre: "María",
-    //     apellido: "Perez_Nro_11",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456711"
-    //   },
-    //   {
-    //     id: 12,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_12",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456712"
-    //   },
-    //   {
-    //     id: 13,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_13",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456713"
-    //   },
-    //   {
-    //     id: 14,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_14",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456714"
-    //   },
-    //   {
-    //     id: 15,
-    //     nombre: "María",
-    //     apellido: "Perez_Nro_15",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456715"
-    //   },
-    //   {
-    //     id: 16,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_16",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456716"
-    //   },
-    //   {
-    //     id: 17,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_17",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456717"
-    //   },
-    //   {
-    //     id: 18,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_18",
-    //     tipoDoc: "Pasaporte",
-    //     nroDoc: "123456718"
-    //   },
-    //   {
-    //     id: 19,
-    //     nombre: "Juan",
-    //     apellido: "Perez_Nro_19",
-    //     tipoDoc: "DNI",
-    //     nroDoc: "123456719"
-    //   },
-    //   {
-    //     id: 20,
-    //     nombre: "María",
-    //     apellido: "Perez_Nro_20",
-    //     tipoDoc: "LC",
-    //     nroDoc: "123456720"
-    //   }
-    // ];
-    // const resp = data.filter((huesped) => {
-    //   return (
-    //     (formData.nombre === "" || huesped.nombre.toLowerCase().includes(formData.nombre.toLowerCase())) &&
-    //     (formData.apellido === "" || huesped.apellido.toLowerCase().includes(formData.apellido.toLowerCase())) &&
-    //     (formData.tipoDoc === "" || huesped.tipoDoc.toLowerCase() === formData.tipoDoc.toLowerCase()) &&
-    //     (formData.nroDoc === "" || huesped.nroDoc.includes(formData.nroDoc))
-    //   );
-    // });
-    //const result = resp;
-    //setData(result);
     setBuscado(true);
   }
   return (
@@ -305,14 +160,12 @@ const HuespedSearchPage = () => {
                   <div className="text-left text-gray-500">
                     {huesped.docIdentidad}
                   </div>
-                  <div className="text-right font-medium">
-                    <p
-                      // href={`/huesped/${huesped.id}/modificar`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Modificar
-                    </p>
-                  </div>
+
+                   <div className="text-right font-medium">
+                    <Link href={`/huesped/${huesped.id}/modificar`} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                        Modificar
+                    </Link>
+                  </div> 
                 </div>
               ))}
             </div>
