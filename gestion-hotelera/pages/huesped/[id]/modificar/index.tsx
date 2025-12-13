@@ -33,25 +33,62 @@ type FormData = {
     nacionalidad: string;
     ocupacion: string;
     fechaNacimiento: string;
+    contactoId: number;
     domicilio: string;
     pais: string;
     localidad: string;
 };
 
+const initialFormData: FormData = {
+    nombre: '',
+    apellido: '',
+    tipoDoc: '',
+    nroDoc: '',
+    email: '',
+    telefono: '',
+    posIva: '',
+    nacionalidad: '',
+    ocupacion: '',
+    fechaNacimiento: '',
+    contactoId: 0, // <-- El ID inicial es 0, no undefined
+    domicilio: '',
+    pais: '',
+    localidad: '',
+};
+
+const transformToHuespedData = (data: Partial<FormData>, huespedId: number): HuespedData => {
+  const contactoId = data.contactoId;
+  console.log("id de contacto:", contactoId)
+  if (!contactoId || contactoId == 0) {
+    console.log("no se cargó el contacto")
+    throw new Error("El ID de MediosDeContacto es inválido o no se cargó correctamente.");
+  }
+    return {
+        id: huespedId,
+        posIva: data.posIva || '',
+        nacionalidad: data.nacionalidad || '',
+        ocupacion: data.ocupacion || '',
+        fechaNacimiento: data.fechaNacimiento || '',
+        mediosDeContacto: {
+            id: data.contactoId || 0,
+            telefono: data.telefono || '',
+            correo: data.email || '',
+            domicilio: data.domicilio || '',
+            pais: data.pais || '',
+            localidad: data.localidad || '',
+        },
+        nombre: data.nombre || '',
+        apellido: data.apellido || '',
+        docIdentidad: data.nroDoc || '',
+        tipoDoc: data.tipoDoc || '',
+    };
+}
+
 function Huesped() {
     const router = useRouter();
     const { id } = router.query;
-    // const [formData, setFormData] = useState({
-    //   nombre: "",
-    //   apellido: "",
-    //   tipoDoc: "",
-    //   nroDoc: "",
-    //   email: "",
-    //   telefono: ""
-    // });
-    const [formData, setFormData] = useState<Partial<FormData>>({});
+    const [formData, setFormData] = useState<FormData>(initialFormData);
 
-    
     //const [huesped, setHuesped] = useState<HuespedData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -72,19 +109,20 @@ function Huesped() {
                 }
                 const data = await res.json();
                 setFormData({
-                    nombre: data.nombre,
-                    apellido: data.apellido,
-                    tipoDoc: data.tipoDoc,
-                    nroDoc: data.docIdentidad,
-                    email: data.mediosDeContacto.correo,
-                    telefono: data.mediosDeContacto.telefono,
-                    posIva: data.posIva,
-                    nacionalidad: data.nacionalidad,
-                    ocupacion: data.ocupacion,
-                    fechaNacimiento: data.fechaNacimiento,
-                    domicilio: data.mediosDeContacto.domicilio,
-                    pais: data.mediosDeContacto.pais,
-                    localidad: data.mediosDeContacto.localidad,
+                    nombre: data.nombre || '',
+                    apellido: data.apellido || '',
+                    tipoDoc: data.tipoDoc || '',
+                    nroDoc: data.docIdentidad || '',
+                    email: data.mediosDeContacto.correo || '',
+                    telefono: data.mediosDeContacto.telefono || '',
+                    posIva: data.posIva || '',
+                    nacionalidad: data.nacionalidad || '',
+                    ocupacion: data.ocupacion || '',
+                    fechaNacimiento: data.fechaNacimiento || '',
+                    contactoId: data.mediosDeContacto.id || 0,
+                    domicilio: data.mediosDeContacto.domicilio || '',
+                    pais: data.mediosDeContacto.pais || '',
+                    localidad: data.mediosDeContacto.localidad || '',
                 });
             } catch (error) {
                 console.error(error);
@@ -106,9 +144,43 @@ function Huesped() {
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Aquí iría la lógica para enviar los datos al backend y modificar el huésped
+        const huespedId = id ? Number(id) : undefined;
+        if (!huespedId) {
+            console.error("ID de huésped inválido");
+            return;
+        }
+        let huespedPayLoad: HuespedData;
+        try {
+            huespedPayLoad = transformToHuespedData(formData, huespedId);
+        } catch (error) {
+            console.error("Error al transformar los datos del formulario:", error);
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(
+                `http://localhost:8080/api/huesped/${huespedId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(huespedPayLoad),
+                }
+            );
+            if (!res.ok) {
+                throw new Error("Error al modificar los datos del huésped");
+            }
+        } catch (error) {
+            console.error(error);
+            setError("Ha ocurrido un error al modificar los datos del huésped.");
+            return;
+        } finally {
+            setLoading(false);
+        }
         console.log("Modificando huésped con datos:", formData);
-        // Simular redirección después de modificar
         router.push(`/huesped/${id}`);
       };
       if (loading) return <p>Cargando...</p>;
@@ -349,6 +421,7 @@ function Huesped() {
                 <button
                     type="submit"
                     className="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+                    
                 >
                     Modificar Huésped
                 </button>
