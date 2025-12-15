@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from 'next/link';
 
 
+
 interface Huesped {
   id: number;
   nombre: string;
@@ -148,7 +149,11 @@ const HuespedSearchPage = () => {
             </div>
             <div className="divide-y divide-gray-200">
               {data.map((huesped) => (
-                <div key={huesped.id} className="grid grid-cols-5 gap-0 p-3 text-sm hover:bg-gray-50 transition duration-150">
+                <Link 
+                key={huesped.id} 
+                href={`/huesped/${huesped.id}`}
+                className="grid grid-cols-5 gap-0 p-3 text-sm hover:bg-gray-50 transition duration-150"                
+                >
                   <div className="text-left text-gray-900 font-medium">
                     {huesped.nombre}
                   </div>
@@ -167,7 +172,7 @@ const HuespedSearchPage = () => {
                         Modificar
                     </Link>
                   </div> 
-                </div>
+                </Link>
               ))}
             </div>
           </div>

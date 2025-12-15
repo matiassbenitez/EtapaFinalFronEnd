@@ -121,6 +121,14 @@ function Huesped () {
             className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 ease-in-out"
             onClick={() => {
               // Lógica de borrado
+              try {
+              fetch(`http://localhost:8080/api/huesped/${id}`, {
+                method: 'DELETE',
+              });
+              router.push('/huesped/buscar');
+              } catch (error) {
+                console.error("Error al borrar el huésped:", error);
+              }
               setIsModalOpen(false);
             }}
           >
