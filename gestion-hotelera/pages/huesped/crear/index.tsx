@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import React from "react";
 
-// --- Definiciones de Tipos (Inalteradas) ---
+// --- Definiciones de Tipos (Mantenidas) ---
 
 interface HuespedData {
-    id: number;
+    id: number | null;
     posIva: string;
     nacionalidad: string;
     ocupacion: string;
     fechaNacimiento: string;
     mediosDeContacto: {
-        id: number;
+        id: number | null;
         telefono: string;
         correo: string;
         domicilio: string;
@@ -41,6 +41,7 @@ type FormData = {
     localidad: string;
 };
 
+
 const initialFormData: FormData = {
     nombre: '',
     apellido: '',
@@ -58,127 +59,60 @@ const initialFormData: FormData = {
     localidad: '',
 };
 
-const transformToHuespedData = (data: Partial<FormData>, huespedId: number): HuespedData => {
-  const contactoId = data.contactoId;
-  console.log("id de contacto:", contactoId)
-  if (!contactoId || contactoId === 0) {
-    console.log("no se cargó el contacto")
-    // Se recomienda lanzar un error con un mensaje al usuario para mejor UX
-    throw new Error("El ID de MediosDeContacto es inválido o no se cargó correctamente. Por favor, recargue la página.");
-  }
+const transformToNewHuespedData = (data: FormData): Partial<HuespedData> => {
+
     return {
-        id: huespedId,
-        posIva: data.posIva || '',
-        nacionalidad: data.nacionalidad || '',
-        ocupacion: data.ocupacion || '',
-        fechaNacimiento: data.fechaNacimiento || '',
+
+        posIva: data.posIva,
+        nacionalidad: data.nacionalidad,
+        ocupacion: data.ocupacion,
+        fechaNacimiento: data.fechaNacimiento,
         mediosDeContacto: {
-            id: data.contactoId || 0,
-            telefono: data.telefono || '',
-            correo: data.email || '',
-            domicilio: data.domicilio || '',
-            pais: data.pais || '',
-            localidad: data.localidad || '',
+            id: null,
+            telefono: data.telefono,
+            correo: data.email,
+            domicilio: data.domicilio,
+            pais: data.pais,
+            localidad: data.localidad,
         },
-        nombre: data.nombre || '',
-        apellido: data.apellido || '',
-        docIdentidad: data.nroDoc || '',
-        tipoDoc: data.tipoDoc || '',
+        nombre: data.nombre,
+        apellido: data.apellido,
+        docIdentidad: data.nroDoc,
+        tipoDoc: data.tipoDoc,
     };
 }
 
-function Huesped() {
+function CrearHuesped() {
     const router = useRouter();
-    const { id } = router.query;
     const [formData, setFormData] = useState<FormData>(initialFormData);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    // isModalOpen no se utiliza en el código original, lo dejo comentado
-
-    useEffect(() => {
-        if (!id) return;
-
-        const fetchHuesped = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const res = await fetch(
-                    `http://localhost:8080/api/huesped/${id}`
-                );
-                if (!res.ok) {
-                    // Manejo específico para 404
-                    if (res.status === 404) {
-                        setFormData(initialFormData); // No encontrado
-                        throw new Error("Huésped no encontrado (404)");
-                    }
-                    throw new Error(`Error ${res.status} al obtener los datos del huésped`);
-                }
-                const data = await res.json();
-                
-                // Mapeo más seguro de los datos de la API al estado del formulario
-                const contacto = data.mediosDeContacto || {};
-                setFormData({
-                    nombre: data.nombre || '',
-                    apellido: data.apellido || '',
-                    tipoDoc: data.tipoDoc || '',
-                    nroDoc: data.docIdentidad || '',
-                    email: contacto.correo || '',
-                    telefono: contacto.telefono || '',
-                    posIva: data.posIva || '',
-                    nacionalidad: data.nacionalidad || '',
-                    ocupacion: data.ocupacion || '',
-                    // Ajustar el formato de fecha si es necesario (asumiendo que viene en formato 'YYYY-MM-DD')
-                    fechaNacimiento: data.fechaNacimiento ? data.fechaNacimiento.substring(0, 10) : '',
-                    contactoId: contacto.id || 0,
-                    domicilio: contacto.domicilio || '',
-                    pais: contacto.pais || '',
-                    localidad: contacto.localidad || '',
-                });
-            } catch (error: any) {
-                console.error("Error al cargar huésped:", error.message || error);
-                setError(
-                    error.message || "Ha ocurrido un error al cargar los datos del huésped."
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchHuesped();
-    }, [id]);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     
+
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        if (successMessage) setSuccessMessage(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        const huespedId = id ? Number(id) : undefined;
-        if (!huespedId || isNaN(huespedId)) {
-            console.error("ID de huésped inválido o ausente en la URL.");
-            setError("ID de huésped inválido o ausente.");
-            return;
-        }
-
-        let huespedPayLoad: HuespedData;
-        try {
-            huespedPayLoad = transformToHuespedData(formData, huespedId);
-        } catch (err: any) {
-            console.error("Error al transformar los datos del formulario:", err.message);
-            setError(`Error de validación: ${err.message}`);
-            return;
-        }
+        // 1. Transformar datos
+        const huespedPayLoad = transformToNewHuespedData(formData);
 
         setLoading(true);
         setError(null);
+        setSuccessMessage(null);
+
         try {
             const res = await fetch(
-                `http://localhost:8080/api/huesped/${huespedId}`,
+                `http://localhost:8080/api/huesped`,
                 {
-                    method: "PUT",
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -187,49 +121,55 @@ function Huesped() {
             );
 
             if (!res.ok) {
-                const errorBody = await res.json().catch(() => ({ message: 'Error desconocido' }));
-                throw new Error(errorBody.message || `Error al modificar los datos del huésped. Estado: ${res.status}`);
+                const errorBody = await res.json().catch(() => ({ message: 'Error desconocido del servidor.' }));
+                throw new Error(errorBody.message || `Error al crear el huésped. Estado: ${res.status}`);
             }
 
-            // Simular un mensaje de éxito rápido o redirigir
-            console.log("Huésped modificado con éxito.");
-            router.push(`/huesped/${id}`); // Redirigir al detalle o a la lista
+            const newHuesped = await res.json();
+            
+
+            setFormData(initialFormData); 
+            setSuccessMessage(`Huésped "${newHuesped.nombre} ${newHuesped.apellido}" creado con éxito. ID: ${newHuesped.id}`);
+            
+            router.push(`/huesped/${newHuesped.id}`);
 
         } catch (err: any) {
-            console.error("Error en la petición PUT:", err.message);
-            setError(`Error al modificar: ${err.message}`);
+            console.error("Error en la petición POST:", err.message);
+            setError(`Error al crear el huésped: ${err.message}`);
         } finally {
             setLoading(false);
         }
       };
-
-    // --- Renderizado de Estados ---
-    const LoadingState = () => (
-        <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            <p className="ml-3 text-lg text-indigo-600">Cargando...</p>
-        </div>
-    );
-
-    const ErrorState = ({ message }: { message: string }) => (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <strong className="font-bold">Error:</strong>
-            <span className="block sm:inline ml-2">{message}</span>
-        </div>
-    );
     
-    if (loading && !formData.nombre) return <LoadingState />;
-    if (error) return <ErrorState message={error} />;
-    if (!formData.nombre && !loading) return <ErrorState message="No se encontró el huésped o el ID es inválido." />;
+    const LoadingState = () => (
+        <div className="flex justify-center items-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <p className="ml-3 text-md text-indigo-600">Procesando...</p>
+        </div>
+    );
 
-    // --- Componente principal con estilos mejorados ---
+    const Alert = ({ message, type }: { message: string, type: 'error' | 'success' }) => {
+        const baseClasses = "px-4 py-3 rounded relative mb-4";
+        const errorClasses = "bg-red-100 border border-red-400 text-red-700";
+        const successClasses = "bg-green-100 border border-green-400 text-green-700";
+        
+        return (
+            <div className={`${baseClasses} ${type === 'error' ? errorClasses : successClasses}`} role="alert">
+                <strong className="font-bold">{type === 'error' ? '¡Error!' : '¡Éxito!'}</strong>
+                <span className="block sm:inline ml-2">{message}</span>
+            </div>
+        );
+    };
+
     return (
-        // Contenedor principal centrado, responsive y con sombra sutil
         <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl bg-white shadow-xl rounded-lg my-8">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-6 border-b pb-2">
-                Modificar Huésped # {id}
+              Cargar Nuevo Huésped
             </h1>
             
+            {successMessage && <Alert message={successMessage} type="success" />}
+            {error && <Alert message={error} type="error" />}
+
             <form onSubmit={handleSubmit} className="space-y-6">
                 
                 {/* --- Sección de Datos Personales --- */}
@@ -242,7 +182,7 @@ function Huesped() {
                     {/* Apellido */}
                     <FormInput label="Apellido" name="apellido" value={formData.apellido} onChange={handleChange} type="text" required />
                     
-                    {/* Tipo de Documento (Select mejorado) */}
+                    {/* Tipo de Documento */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tipoDoc">Tipo de Documento</label>
                         <select
@@ -254,9 +194,9 @@ function Huesped() {
                             required
                         >
                             <option value="" disabled>Seleccione un tipo...</option>
-                            <option value="dni">DNI</option>
-                            <option value="le">LE</option>
-                            <option value="lc">LC</option>
+                            <option value="DNI">DNI</option> {/* Usamos mayúsculas para coincidir con tu Enum de Java (TipoDoc) */}
+                            <option value="LE">LE</option>
+                            <option value="LC">LC</option>
                         </select>
                     </div>
 
@@ -298,19 +238,24 @@ function Huesped() {
                     {/* Localidad */}
                     <FormInput label="Localidad" name="localidad" value={formData.localidad} onChange={handleChange} type="text" required />
 
-                    {/* Campo oculto pero importante para el payload */}
-                    <input type="hidden" name="contactoId" value={formData.contactoId} />
-
                 </div>
                 
                 {/* --- Botón de Submit --- */}
                 <div className="pt-4">
                     <button
                         type="submit"
-                        disabled={loading} // Deshabilitar el botón durante la carga
-                        className="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        disabled={loading}
+                        className="w-full md:w-auto bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                        {loading ? 'Guardando...' : 'Modificar Huésped'}
+                        {loading ? <LoadingState /> : 'Crear Huésped'}
+                    </button>
+                    {/* Botón de Cancelar */}
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="w-full md:w-auto ml-0 mt-2 md:mt-0 md:ml-4 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300 ease-in-out"
+                    >
+                        Cancelar
                     </button>
                 </div>
             </form>
@@ -318,8 +263,7 @@ function Huesped() {
     );
 }
 
-export default Huesped;
-
+export default CrearHuesped;
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -341,10 +285,11 @@ const FormInput: React.FC<FormInputProps> = ({ label, name, value, onChange, typ
             id={name}
             name={name}
             value={value}
-            onChange={onChange as any} // 'as any' para simplificar la prop de onChange que es más genérica en el padre
+            onChange={onChange as any} 
             className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
             required={required}
             {...props}
         />
     </div>
 );
+

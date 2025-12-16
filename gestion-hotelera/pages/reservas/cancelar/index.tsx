@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { MOCK_RESERVAS } from "@/data/mockReservas";
+import React, { useState, useCallback } from "react";
 
 interface Reserva {
     id: number;
@@ -13,62 +12,77 @@ function CancelarReservaPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [busquedaRealizada, setBusquedaRealizada] = useState<boolean>(false);
+    const [cancellingId, setCancellingId] = useState<number | null>(null);
+    
+    const fetchData = useCallback(async (url: string) => {
+        setLoading(true);
+        setError(null);
+        setBusquedaRealizada(true);
+    
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error ${response.status}: ${errorText || "Respuesta de red no exitosa"}`);
+            }
+            
+            const data: Reserva[] = await response.json();
+            setReservas(data);
+        } catch (err: any) {
+            console.error("Error al obtener datos:", err);
+            setError(`Error al buscar reservas: ${err.message || "Error de conexión"}`);
+            setReservas([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const handleCancel = async (reservaId: number) => {
+      setCancellingId(reservaId);
+      setError(null);
+      const arrayReservasIds: number[] = [reservaId];
+      try {
+          const response = await fetch(`http://localhost:8080/api/reserva/cancelar`, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(arrayReservasIds),
+      });
+      if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error ${response.status}: ${errorText || "Respuesta de red no exitosa"}`);
+      }
+      setReservas((prevReservas) => prevReservas.filter((reserva) => reserva.id !== reservaId));
+      } catch (err: any) {
+          console.error("Error al cancelar la reserva:", err);
+          setError(`Error al cancelar la reserva: ${err.message || "Error de conexión"}`);
+      } finally {
+          setCancellingId(null);
+      }
+    };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const url = "/api/reservas/buscar";
+        const urlBase = "http://localhost:8080/api/reserva/responsable";
         const formData = new FormData(event.target as HTMLFormElement);
-        const nombre = formData.get("nombre") as string;
-        const apellido = formData.get("apellido") as string;
-        setLoading(true);
-        setError(null);
-        setBusquedaRealizada(true);
-        // try {
-        //     await fetchData(url, nombre, apellido);
-        // } catch (error) {
-        //     console.error("Error fetching data:", error);
-        // }
-        setReservas(
-            MOCK_RESERVAS.filter(
-                (reserva) =>
-                    reserva.nombre.toLowerCase() === nombre.toLowerCase() &&
-                    reserva.apellido.toLowerCase() === apellido.toLowerCase()
-            )
-        );
-        setLoading(false);
-
-    await new Promise(resolve => setTimeout(resolve, 500)); 
-            setReservas(MOCK_RESERVAS); 
-            setLoading(false);
-            console.log("Datos simulados cargados:", MOCK_RESERVAS);
-        return true;
+        const nombre = (formData.get("nombre") as string || '').trim();
+        const apellido = (formData.get("apellido") as string|| '').trim();
+        const params = new URLSearchParams();
+        if (nombre) params.append("nombre", nombre);
+        if (apellido) params.append("apellido", apellido);
+        const urlFinal = `${urlBase}${params.toString() ? '?' + params.toString() : ''}`;
+        await fetchData(urlFinal);
       };
     
 
-    // const fetchData = async (url: string, nombre: string, apellido: string) => {
-    //     try {
-    //         const response = await fetch(url, {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify({ nombre, apellido }),
-    //         });
-    //         if (!response.ok) {
-    //             throw new Error("Network response was not ok");
-    //         }
-
-    //         const data: Reserva[] = await response.json();
-    //         setReservas(data);
-    //     } catch (error) {
-    //         console.error("Error fetching data:", error);
-    //         setError("Error fetching data");
-    //         setReservas([]);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -108,7 +122,10 @@ function CancelarReservaPage() {
                                         <strong>Estado:</strong>{" "}
                                         {reserva.estado}
                                     </p>
-                                    <button className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                    <button 
+                                        onClick={() => handleCancel(reserva.id)}
+                                        disabled={cancellingId === reserva.id}
+                                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
                                         Cancelar Reserva
                                     </button>
                                 </div>

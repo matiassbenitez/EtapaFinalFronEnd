@@ -19,11 +19,11 @@ interface HabitacionData {
 }
 
 interface TablaEstadoDeHabitacionesProps {
+  listado: ReservaPendiente[];
   habitaciones: HabitacionData[];
   fechaInicio: string;
   fechaFin: string;
   onReservaSeleccionada: (reserva: ReservaPendiente) => void;
-  reservaActual: ReservaPendiente | null;
 }
 
 type ReservaPendiente = {
@@ -42,10 +42,14 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 const obtenerClaseEstado = (estado: string) => {
   switch (estado) {
-    case 'OCUPADO': return 'bg-blue-400 text-white font-bold';
-    case 'FUERA_DE_SERVICIO': return 'bg-yellow-400 text-gray-900 font-bold';
-    case 'RESERVADO': return 'bg-red-400 text-white font-bold';
-    default: return 'bg-green-400 text-white font-bold'; // DISPONIBLE
+    case 'OCUPADO': 
+      return 'bg-blue-100 text-blue-700 border-blue-200';
+    case 'FUERA_DE_SERVICIO': 
+      return 'bg-amber-100 text-amber-700 border-amber-200';
+    case 'RESERVADO': 
+      return 'bg-rose-100 text-rose-700 border-rose-200';
+    default: 
+      return 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'; // DISPONIBLE
   }
 };
 
@@ -85,7 +89,7 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
   fechaInicio, 
   fechaFin,
   onReservaSeleccionada,
-  reservaActual
+  listado
 }) => {
   const [celdasSeleccionadas, setCeldasSeleccionadas] = useState<CeldaSeleccionada[]>([]);
 
@@ -164,22 +168,19 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
     };
 
     const esCeldaSeleccionada = (habitacionId: number, fecha: string): boolean => {
-        // Resaltar la selección temporal (si hay una primera celda)
+
         if (celdasSeleccionadas.length === 1 && celdasSeleccionadas[0].habitacionId === habitacionId && celdasSeleccionadas[0].fecha === fecha) {
             return true;
         }
 
-        // Resaltar todo el rango de la reserva actual (si existe)
-        if (reservaActual && reservaActual.habitacionId === habitacionId) {
+        return listado.some(reserva => {
+            if (reserva.habitacionId !== habitacionId) return false;
             const fechaActual = new Date(fecha);
-            const inicio = new Date(reservaActual.fechaInicio);
-            const fin = new Date(reservaActual.fechaFin);
-            
+            const inicio = new Date(reserva.fechaInicio);
+            const fin = new Date(reserva.fechaFin);
             // Si la fecha actual está entre el inicio y el fin (inclusive)
             return fechaActual.getTime() >= inicio.getTime() && fechaActual.getTime() <= fin.getTime();
-        }
-        
-        return false;
+        });
     };
 
   const fechas: string[] = useMemo(() => {
@@ -191,47 +192,65 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
     return <p>No hay habitaciones disponibles.</p>;
   }
   return (
-    <table className="min-w-full bg-white border">
-      <thead>
-        <tr>
-          <th className="py-2 px-4 border-b">Fecha</th> 
-          {habitaciones.map((habitacion) => (
-            <th key={habitacion.id} className="py-2 px-4 border-b">
-              Habitación {habitacion.id}
+
+    <div className="relative z-0 overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-gray-200">
+      <table className="min-w-full border-separate border-spacing-0 bg-white">
+        <thead className="bg-gray-50">
+          <tr>
+
+            <th className="sticky top-0 left-0 z-50 bg-gray-100 p-4 border-b border-r border-gray-200 text-left text-xs font-bold uppercase text-gray-600 shadow-[2px_2px_5px_rgba(0,0,0,0.1)]">
+              Calendario
             </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {fechas.map((fecha) => (
-          <tr key={fecha}>
-            <td className="py-2 px-4 border-b font-medium text-gray-700">{fecha}</td>
-            
-            {habitaciones.map((habitacion) => {
-              // Calculamos el estado de ESA habitación en ESA fecha
-              const estado = estadosPorDia(habitacion, fecha); 
-              const claseEstado = obtenerClaseEstado(estado);
-              
-              // Usamos una clave compuesta (o id único) para evitar advertencias
-              const cellKey = `${fecha}-${habitacion.id}`; 
-              
-              return (
-                <td 
-                  key={cellKey}
-                  data-id={habitacion.id}
-                  data-fecha={fecha}
-                  onClick={() => handleCeldaClick(habitacion.id, fecha, estado, fechas.indexOf(fecha))} 
-                  className={`py-2 px-4 border-b text-center text-sm ${claseEstado}
-                  ${esCeldaSeleccionada(habitacion.id, fecha) ? 'border-4 border-black/50' : ''}`}
-                >
-                  {estado}
-                </td>
-              );
-            })}
+            {habitaciones.map((habitacion) => (
+
+              <th 
+                key={habitacion.id} 
+                className="sticky top-0 z-30 bg-gray-50 p-4 border-b border-r border-gray-200 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.05)]"
+              >
+                Hab. {habitacion.id}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {fechas.map((fecha) => (
+            <tr key={fecha} className="hover:bg-gray-50/50 transition-colors">
+
+              <td className="sticky left-0 z-20 bg-white py-3 px-6 border-r border-gray-200 font-medium text-sm text-gray-600 whitespace-nowrap min-w-[140px] shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                {new Date(fecha).toLocaleDateString('es-ES', { 
+                    weekday: 'short', 
+                    day: '2-digit', 
+                    month: 'short' 
+                })}
+              </td>
+              
+              {habitaciones.map((habitacion) => {
+                const estado = estadosPorDia(habitacion, fecha); 
+                const claseEstado = obtenerClaseEstado(estado);
+                const cellKey = `${fecha}-${habitacion.id}`; 
+                const seleccionada = esCeldaSeleccionada(habitacion.id, fecha);
+                
+                return (
+                  <td 
+                    key={cellKey}
+                    onClick={() => handleCeldaClick(habitacion.id, fecha, estado, fechas.indexOf(fecha))} 
+                    className={`
+                      relative py-4 px-3 border-r border-b border-gray-100 text-center cursor-pointer transition-all duration-200
+                      ${claseEstado}
+                      ${seleccionada ? 'ring-2 ring-inset ring-black z-10 shadow-lg scale-[0.98]' : ''}
+                    `}
+                  >
+                    <span className="text-[10px] font-bold tracking-tight uppercase">
+                      {estado}
+                    </span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

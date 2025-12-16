@@ -46,10 +46,8 @@ const HuespedSearchPage = () => {
     }, {});
     const params = new URLSearchParams(filteredFormData).toString();
     console.log("params:", params);
-    // const baseURL = "http://localhost:8080/api/huesped"
     try {
     const response = await fetch(`${baseURL}?${params}`, {
-    //const response = await fetch(`${baseURL}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
