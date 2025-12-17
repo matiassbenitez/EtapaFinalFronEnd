@@ -1,6 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import Link from 'next/link';
+import { useRouter } from "next/router";
+import { type } from './../../../.next/types/routes.d';
 
 
 
@@ -13,6 +15,7 @@ interface Huesped {
 }
 
 const HuespedSearchPage = () => {
+  const router = useRouter();
   const [buscado, setBuscado] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(
@@ -130,6 +133,9 @@ const HuespedSearchPage = () => {
                 className="w-full h-10 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-150">
                 Buscar
               </button>
+              <button type="button" onClick={router.back} className="mt-2 w-full h-10 bg-gray-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-700 transition duration-150">
+                    Volver
+                </button>
             </div>
           </div>
         </form>
@@ -143,13 +149,12 @@ const HuespedSearchPage = () => {
               <div className="text-left">Apellido</div>
               <div className="text-left">Tipo de Documento</div>
               <div className="text-left">Número de Documento</div>
-              <div className="text-right">Acción</div>
+              <div className="text-center">Acción</div>
             </div>
             <div className="divide-y divide-gray-200">
               {data.map((huesped) => (
-                <Link 
+                <div 
                 key={huesped.id} 
-                href={`/huesped/${huesped.id}`}
                 className="grid grid-cols-5 gap-0 p-3 text-sm hover:bg-gray-50 transition duration-150"                
                 >
                   <div className="text-left text-gray-900 font-medium">
@@ -165,12 +170,15 @@ const HuespedSearchPage = () => {
                     {huesped.docIdentidad}
                   </div>
 
-                   <div className="text-right font-medium">
+                   <div className="text-center font-medium">
                     <Link href={`/huesped/${huesped.id}/modificar`} className="text-indigo-600 hover:text-indigo-900 mr-4">
                         Modificar
                     </Link>
+                    <Link href={`/huesped/${huesped.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                        Detalle
+                    </Link>
                   </div> 
-                </Link>
+                </div>
               ))}
             </div>
           </div>

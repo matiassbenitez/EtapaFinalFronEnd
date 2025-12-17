@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect, useCallback } from "react";
 import TablaEstadoDeHabitaciones from "../../../components/TablaEstadoDeHabitaciones";
 import ModalHuesped from "./../../../components/ModalHuesped";
+import { useRouter } from "next/router";
 
 type ReservaPendiente = {
     habitacionId: number;
@@ -41,6 +42,7 @@ const enviarReservasAlServidor = async (reserva: ReservaData) => {
 };
 
 const MostrarEstadoHabitaciones = () => {
+    const router = useRouter();
     const [habitaciones, setHabitaciones] = useState([]);
     //const [reservaPendiente, setReservaPendiente] = useState<ReservaPendiente | null>(null);
     const [listaReservas, setListaReservas] = useState<ReservaPendiente[]>([]);
@@ -98,10 +100,8 @@ const MostrarEstadoHabitaciones = () => {
 
     const fetchHabitaciones = useCallback(async () => {
         if (!filtros.fechaInicio || !filtros.fechaFin) {
-            // Si falta alguna fecha, detenemos la función.
-            // Opcional: Establecer 'loading' a false inmediatamente para no mostrar "Cargando..."
             setLoading(false);
-            setHabitaciones([]); // Limpiamos resultados anteriores si existieran
+            setHabitaciones([]); 
             return;
         }
 
@@ -136,6 +136,10 @@ const MostrarEstadoHabitaciones = () => {
         }
     }, [filtros]);
 
+    const fechasInvertidas =
+        filtros.fechaInicio &&
+        filtros.fechaFin &&
+        new Date(filtros.fechaInicio) > new Date(filtros.fechaFin);
     useEffect(() => {
         fetchHabitaciones();
     }, [filtros, fetchHabitaciones]);
@@ -186,7 +190,12 @@ const MostrarEstadoHabitaciones = () => {
                 </div>
             </form>
             <div className="relative z-0 overflow-hidden rounded-xl border border-gray-200">
-                {loading ? (
+                {fechasInvertidas ? (
+                    <div className="p-10 text-center text-amber-600 bg-amber-50 font-medium">
+                        La fecha de inicio debe ser anterior a la fecha de
+                        fin.
+                    </div>
+                ) : loading ? (
                     <div className="p-10 text-center text-gray-500">
                         Cargando...
                     </div>
@@ -234,6 +243,9 @@ const MostrarEstadoHabitaciones = () => {
                     </button>
                 </div>
             )}
+            <button type="button" onClick={router.back} className="mt-2 w-full h-10 bg-gray-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-700 transition duration-150">
+                                Volver
+                            </button>
         </div>
     );
 };

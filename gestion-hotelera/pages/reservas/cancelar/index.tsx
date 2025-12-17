@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useRouter } from "next/router";
 
 interface Reserva {
     id: number;
@@ -8,6 +9,7 @@ interface Reserva {
     estado: string;
 }
 function CancelarReservaPage() {
+    const router = useRouter();
     const [reservas, setReservas] = useState<Reserva[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -97,6 +99,9 @@ function CancelarReservaPage() {
                 <button type="submit" disabled={loading} className="mt-2 w-full h-10 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-150">
                     {loading ? "Buscando..." : "Buscar"}
                 </button>
+                <button type="button" onClick={router.back} className="mt-2 w-full h-10 bg-gray-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-700 transition duration-150">
+                    Volver
+                </button>
             </form>
             {error && <p className="text-red-500">{error}</p>}
             <div className="mt-4">
@@ -107,6 +112,7 @@ function CancelarReservaPage() {
                         </h2>
                         <div className="space-y-4">
                             {reservas.map((reserva) => (
+                              console.log(reserva),
                                 <div
                                     key={reserva.id}
                                     className="p-4 border rounded shadow">
@@ -124,8 +130,9 @@ function CancelarReservaPage() {
                                     </p>
                                     <button 
                                         onClick={() => handleCancel(reserva.id)}
-                                        disabled={cancellingId === reserva.id}
-                                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                        disabled={cancellingId === reserva.id || reserva.estado == 'CANCELADA'}
+                                    className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600
+                                    disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400">
                                         Cancelar Reserva
                                     </button>
                                 </div>
