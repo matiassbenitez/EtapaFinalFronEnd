@@ -359,7 +359,7 @@ function CrearHuesped() {
                         name="localidad"
                         value={formData.localidad}
                         onChange={handleChange}
-                        errorText={formErrors.pais}
+                        errorText={formErrors.localidad}
                         type="text"
                         required
                     />

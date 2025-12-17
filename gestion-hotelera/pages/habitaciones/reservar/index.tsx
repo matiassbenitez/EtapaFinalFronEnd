@@ -85,8 +85,8 @@ const MostrarEstadoHabitaciones = () => {
             enviarReservasAlServidor(reservaCompleta);
         }
         fetchHabitaciones();
-        setListaReservas([]);
         setMostrarModalHuesped(false);
+        setListaReservas([]);
     };
 
     const handleFiltroChange = (

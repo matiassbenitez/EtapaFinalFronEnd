@@ -250,10 +250,16 @@ function Huesped() {
 
     if (loading && !formData.nombre) return <LoadingState />;
     if (error) return <ErrorState message={error} />;
-    if (!formData.nombre && !loading)
-        return (
-            <ErrorState message="No se encontró el huésped o el ID es inválido." />
-        );
+    if (!loading && formData.contactoId === 0) {
+    return (
+        <div className="container mx-auto p-8 text-center">
+            <ErrorState message="No se pudo cargar la información del huésped. Verifique el ID en la URL." />
+            <button onClick={() => router.back()} className="mt-4 text-indigo-600 underline">
+                Volver atrás
+            </button>
+        </div>
+    );
+}
 
     // --- Componente principal con estilos mejorados ---
     return (
@@ -452,6 +458,10 @@ function Huesped() {
                     >
                         {loading ? "Guardando..." : "Modificar Huésped"}
                     </button>
+                    <button type="button" onClick={router.back} className="ml-4 w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-700 transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                    Volver
+                </button>
+                    
                 </div>
             </form>
         </div>
