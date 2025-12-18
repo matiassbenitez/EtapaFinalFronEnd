@@ -81,7 +81,7 @@ const ModalHuesped: React.FC<ModalHuespedProps> = ({ mostrar, onConfirmar, onCan
         />
         <div className="flex justify-end">
           <button 
-            onClick={handleLimpiarYSalir} // Usar la función de limpieza al cancelar
+            onClick={handleLimpiarYSalir}
             className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded transition"
           >
             Cancelar

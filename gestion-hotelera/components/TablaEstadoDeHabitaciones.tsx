@@ -49,7 +49,7 @@ const obtenerClaseEstado = (estado: string) => {
     case 'RESERVADO': 
       return 'bg-rose-100 text-rose-700 border-rose-200';
     default: 
-      return 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'; // DISPONIBLE
+      return 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'; 
   }
 };
 
@@ -67,9 +67,7 @@ const fechasEnRango = (fechaInicio: string, fechaFin: string): string[] => {
 const estadosPorDia = (habitacion: HabitacionData, dia: string): string => {
   const dayTimestamp = new Date(dia).getTime();
   let status = 'DISPONIBLE';
-  //console.log("habitacion:"+ habitacion.id + habitacion.historialEstado)
 if (habitacion.historialEstado && Array.isArray(habitacion.historialEstado)) {
-  //console.log("Historial de estados:", habitacion.historialEstado);
   for (const item of habitacion.historialEstado) {
     const inicioTimestamp = new Date(item.fechaInicio).getTime();
     const finTimestamp = new Date(item.fechaFin).getTime();
@@ -95,7 +93,7 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
 
   const handleCeldaClick = (habitacionId: number, fecha: string, estado: string, rowIndex: number) => {
         
-        // 1. Evitar la selección de celdas no disponibles
+
         if (estado !== 'DISPONIBLE') {
             alert(`No se puede seleccionar una celda con estado: ${estado}`);
             setCeldasSeleccionadas([]);
@@ -105,30 +103,30 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
         const nuevaCelda: CeldaSeleccionada = { habitacionId, fecha, rowIndex };
 
         if (celdasSeleccionadas.length === 0) {
-            // --- Primera Selección ---
+
             setCeldasSeleccionadas([nuevaCelda]);
 
         } else if (celdasSeleccionadas.length === 1) {
             const [sel1] = celdasSeleccionadas;
 
-            // 2. Validar que sea la misma habitación
+
             if (sel1.habitacionId !== nuevaCelda.habitacionId) {
                 alert("No puede seleccionar dos habitaciones diferentes.");
-                setCeldasSeleccionadas([]); // Limpiar selección
+                setCeldasSeleccionadas([]); 
                 return;
             }
 
-            // 3. Determinar el orden correcto de las fechas
+
             let [fechaIni, fechaFin] = [sel1.fecha, nuevaCelda.fecha];
             let [filaIni, filaFin] = [sel1.rowIndex, nuevaCelda.rowIndex];
             
-            // Si la nueva fecha es anterior a la primera, intercambiar
+
             if (new Date(fechaIni) > new Date(fechaFin)) {
                 [fechaIni, fechaFin] = [fechaFin, fechaIni];
                 [filaIni, filaFin] = [filaFin, filaIni];
             }
             
-            // 4. Recorrer el rango de fechas/filas para verificar disponibilidad
+
             const indiceHabitacion = habitaciones.findIndex(h => h.id === habitacionId);
             const fechasRango = fechasEnRango(fechaIni, fechaFin);
             
@@ -147,23 +145,23 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
                 return;
             }
 
-            // 5. Selección y Validación Exitosa: Crear la Reserva y limpiar el estado de selección
+
             const nuevaReserva: ReservaPendiente = {
                 habitacionId: habitacionId,
                 fechaInicio: fechaIni,
                 fechaFin: fechaFin,
             };
             
-            // Notificar al componente padre de la reserva seleccionada
+
             onReservaSeleccionada(nuevaReserva); 
             
-            // Limpiar las celdas seleccionadas (la reserva pendiente se almacena en el padre)
+
             setCeldasSeleccionadas([]); 
 
         } else {
-             // Esto no debería suceder con la lógica anterior, pero es un buen resguardo
+
             setCeldasSeleccionadas([]);
-            handleCeldaClick(habitacionId, fecha, estado, rowIndex); // Volver a iniciar
+            handleCeldaClick(habitacionId, fecha, estado, rowIndex); 
         }
     };
 
@@ -178,7 +176,7 @@ const TablaEstadoDeHabitaciones: React.FC<TablaEstadoDeHabitacionesProps> = ({
             const fechaActual = new Date(fecha);
             const inicio = new Date(reserva.fechaInicio);
             const fin = new Date(reserva.fechaFin);
-            // Si la fecha actual está entre el inicio y el fin (inclusive)
+
             return fechaActual.getTime() >= inicio.getTime() && fechaActual.getTime() <= fin.getTime();
         });
     };

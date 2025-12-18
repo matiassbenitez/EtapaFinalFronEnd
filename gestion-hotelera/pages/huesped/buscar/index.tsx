@@ -41,7 +41,6 @@ const HuespedSearchPage = () => {
     setLoading(true);
     const baseURL = "http://localhost:8080/api/huesped";
     const filteredFormData = Object.keys(formData).reduce((acc, key) => {
-        // Excluir si el valor es una cadena vacía
         if (formData[key] !== "") {
             acc[key] = formData[key];
         }

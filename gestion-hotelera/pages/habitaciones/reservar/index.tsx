@@ -113,7 +113,7 @@ const MostrarEstadoHabitaciones = () => {
         if (filtros.fechaFin)
             params.append("fechaFin", filtros.fechaFin + "T23:59:59");
         console.log("params", params.toString());
-        //if (filtros.tipo) params.append('tipo', filtros.tipo);
+
         const url = `http://localhost:8080/api/habitacion/buscar?${params.toString()}`;
         console.log("URL de fetch:", url);
         try {
@@ -148,8 +148,7 @@ const MostrarEstadoHabitaciones = () => {
     if (error) return <p>Error: {error}</p>;
     return (
         <div className="container mx-auto p-4 relative">
-            {" "}
-            {/* relative ayuda a controlar el contexto */}
+
             <form className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                 <h1 className="text-2xl font-bold mb-4 text-gray-800">
                     Estado de Habitaciones
@@ -210,7 +209,7 @@ const MostrarEstadoHabitaciones = () => {
                         fechaInicio={filtros.fechaInicio}
                         fechaFin={filtros.fechaFin}
                         onReservaSeleccionada={handleReservaSeleccionada}
-                        //reservaActual={reservaPendiente}
+
                     />
                 ) : (
                     <div className="p-10 text-center text-gray-400 bg-gray-50 italic">

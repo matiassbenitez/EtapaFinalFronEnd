@@ -196,7 +196,6 @@ function CrearHuesped() {
             {error && <Alert message={error} type="error" />}
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                {/* --- Sección de Datos Personales --- */}
                 <h2 className="text-xl font-semibold text-indigo-600 border-l-4 border-indigo-600 pl-3 py-1 bg-indigo-50/50">
                     Datos Personales
                 </h2>
@@ -212,7 +211,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Apellido */}
                     <FormInput
                         label="Apellido"
                         name="apellido"
@@ -223,7 +221,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Tipo de Documento */}
                     <div>
                         
                         <FormSelect
@@ -239,13 +236,11 @@ function CrearHuesped() {
                                 Seleccione un tipo...
                             </option>
                             <option value="DNI">DNI</option>{" "}
-                            {/* Usamos mayúsculas para coincidir con tu Enum de Java (TipoDoc) */}
                             <option value="LE">LE</option>
                             <option value="LC">LC</option>
                         </FormSelect>
                     </div>
 
-                    {/* Número de Documento */}
                     <FormInput
                         label="Número de Documento"
                         name="nroDoc"
@@ -256,7 +251,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Fecha de Nacimiento */}
                     <FormInput
                         label="Fecha de Nacimiento"
                         name="fechaNacimiento"
@@ -267,7 +261,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Nacionalidad */}
                     <FormInput
                         label="Nacionalidad"
                         name="nacionalidad"
@@ -278,7 +271,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Ocupación */}
                     <FormInput
                         label="Ocupación"
                         name="ocupacion"
@@ -289,7 +281,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Posición IVA */}
                     <FormInput
                         label="Posición IVA"
                         name="posIva"
@@ -301,13 +292,11 @@ function CrearHuesped() {
                     />
                 </div>
 
-                {/* --- Separador y Sección de Contacto --- */}
                 <hr className="my-8 border-gray-200" />
                 <h2 className="text-xl font-semibold text-indigo-600 border-l-4 border-indigo-600 pl-3 py-1 bg-indigo-50/50">
                     Datos de Contacto y Domicilio
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    {/* Email */}
                     <FormInput
                         label="Email"
                         name="email"
@@ -318,7 +307,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Teléfono */}
                     <FormInput
                         label="Teléfono"
                         name="telefono"
@@ -329,7 +317,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Domicilio (Ocupa toda la fila en md+) */}
                     <div className="md:col-span-2">
                         <FormInput
                             label="Domicilio"
@@ -342,7 +329,6 @@ function CrearHuesped() {
                         />
                     </div>
 
-                    {/* País */}
                     <FormInput
                         label="País"
                         name="pais"
@@ -353,7 +339,6 @@ function CrearHuesped() {
                         required
                     />
 
-                    {/* Localidad */}
                     <FormInput
                         label="Localidad"
                         name="localidad"
@@ -365,7 +350,6 @@ function CrearHuesped() {
                     />
                 </div>
 
-                {/* --- Botón de Submit --- */}
                 <div className="pt-4">
                     <button
                         type="submit"
@@ -374,7 +358,6 @@ function CrearHuesped() {
                     >
                         {loading ? <LoadingState /> : "Crear Huésped"}
                     </button>
-                    {/* Botón de Cancelar */}
                     <button
                         type="button"
                         onClick={() => router.back()}
@@ -439,9 +422,9 @@ const FormInput: React.FC<FormInputProps> = ({
 
 interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     label: string;
-    name: keyof FormData; // Esto asegura que el name sea una llave válida de tu FormData
+    name: keyof FormData;
     errorText?: string;
-    children: React.ReactNode; // Para poder pasar los <option>
+    children: React.ReactNode;
 }
 
 const FormSelect: React.FC<FormSelectProps> = ({

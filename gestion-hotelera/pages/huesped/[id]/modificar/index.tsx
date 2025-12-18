@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import React from "react";
 import { validateHuespedForm } from "@/utils/validations";
 
-// --- Definiciones de Tipos (Inalteradas) ---
 
 interface HuespedData {
     id: number;
@@ -67,7 +66,7 @@ const transformToHuespedData = (
     console.log("id de contacto:", contactoId);
     if (!contactoId || contactoId === 0) {
         console.log("no se cargó el contacto");
-        // Se recomienda lanzar un error con un mensaje al usuario para mejor UX
+
         throw new Error(
             "El ID de MediosDeContacto es inválido o no se cargó correctamente. Por favor, recargue la página."
         );
@@ -112,9 +111,9 @@ function Huesped() {
                     `http://localhost:8080/api/huesped/${id}`
                 );
                 if (!res.ok) {
-                    // Manejo específico para 404
+ 
                     if (res.status === 404) {
-                        setFormData(initialFormData); // No encontrado
+                        setFormData(initialFormData); 
                         throw new Error("Huésped no encontrado (404)");
                     }
                     throw new Error(
@@ -123,7 +122,6 @@ function Huesped() {
                 }
                 const data = await res.json();
 
-                // Mapeo más seguro de los datos de la API al estado del formulario
                 const contacto = data.mediosDeContacto || {};
                 setFormData({
                     nombre: data.nombre || "",
@@ -135,7 +133,6 @@ function Huesped() {
                     posIva: data.posIva || "",
                     nacionalidad: data.nacionalidad || "",
                     ocupacion: data.ocupacion || "",
-                    // Ajustar el formato de fecha si es necesario (asumiendo que viene en formato 'YYYY-MM-DD')
                     fechaNacimiento: data.fechaNacimiento
                         ? data.fechaNacimiento.substring(0, 10)
                         : "",
@@ -219,9 +216,8 @@ function Huesped() {
                 );
             }
 
-            // Simular un mensaje de éxito rápido o redirigir
             console.log("Huésped modificado con éxito.");
-            router.push(`/huesped/${id}`); // Redirigir al detalle o a la lista
+            router.push(`/huesped/${id}`);
         } catch (err: any) {
             console.error("Error en la petición PUT:", err.message);
             setError(`Error al modificar: ${err.message}`);
@@ -230,7 +226,6 @@ function Huesped() {
         }
     };
 
-    // --- Renderizado de Estados ---
     const LoadingState = () => (
         <div className="flex justify-center items-center h-40">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -261,21 +256,17 @@ function Huesped() {
     );
 }
 
-    // --- Componente principal con estilos mejorados ---
     return (
-        // Contenedor principal centrado, responsive y con sombra sutil
         <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl bg-white shadow-xl rounded-lg my-8">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-6 border-b pb-2">
                 Modificar Huésped # {id}
             </h1>
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                {/* --- Sección de Datos Personales --- */}
                 <h2 className="text-xl font-semibold text-indigo-600 border-l-4 border-indigo-600 pl-3 py-1 bg-indigo-50/50">
                     Datos Personales
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    {/* Nombre */}
                     <FormInput
                         label="Nombre"
                         name="nombre"
@@ -286,7 +277,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Apellido */}
                     <FormInput
                         label="Apellido"
                         name="apellido"
@@ -297,7 +287,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Tipo de Documento (Select mejorado) */}
                     <div>
                         <label
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -322,7 +311,6 @@ function Huesped() {
                         </select>
                     </div>
 
-                    {/* Número de Documento */}
                     <FormInput
                         label="Número de Documento"
                         name="nroDoc"
@@ -333,7 +321,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Fecha de Nacimiento */}
                     <FormInput
                         label="Fecha de Nacimiento"
                         name="fechaNacimiento"
@@ -344,7 +331,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Nacionalidad */}
                     <FormInput
                         label="Nacionalidad"
                         name="nacionalidad"
@@ -355,7 +341,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Ocupación */}
                     <FormInput
                         label="Ocupación"
                         name="ocupacion"
@@ -366,7 +351,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Posición IVA */}
                     <FormInput
                         label="Posición IVA"
                         name="posIva"
@@ -378,13 +362,11 @@ function Huesped() {
                     />
                 </div>
 
-                {/* --- Separador y Sección de Contacto --- */}
                 <hr className="my-8 border-gray-200" />
                 <h2 className="text-xl font-semibold text-indigo-600 border-l-4 border-indigo-600 pl-3 py-1 bg-indigo-50/50">
                     Datos de Contacto y Domicilio
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    {/* Email */}
                     <FormInput
                         label="Email"
                         name="email"
@@ -395,7 +377,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Teléfono */}
                     <FormInput
                         label="Teléfono"
                         name="telefono"
@@ -406,7 +387,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Domicilio (Ocupa toda la fila en md+) */}
                     <div className="md:col-span-2">
                         <FormInput
                             label="Domicilio"
@@ -419,7 +399,6 @@ function Huesped() {
                         />
                     </div>
 
-                    {/* País */}
                     <FormInput
                         label="País"
                         name="pais"
@@ -430,7 +409,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Localidad */}
                     <FormInput
                         label="Localidad"
                         name="localidad"
@@ -441,7 +419,6 @@ function Huesped() {
                         required
                     />
 
-                    {/* Campo oculto pero importante para el payload */}
                     <input
                         type="hidden"
                         name="contactoId"
@@ -449,11 +426,10 @@ function Huesped() {
                     />
                 </div>
 
-                {/* --- Botón de Submit --- */}
                 <div className="pt-4">
                     <button
                         type="submit"
-                        disabled={loading} // Deshabilitar el botón durante la carga
+                        disabled={loading} 
                         className="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         {loading ? "Guardando..." : "Modificar Huésped"}
@@ -500,7 +476,7 @@ const FormInput: React.FC<FormInputProps> = ({
             id={name}
             name={name}
             value={value}
-            onChange={onChange as any} // 'as any' para simplificar la prop de onChange que es más genérica en el padre
+            onChange={onChange as any}
             className={`w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 transition duration-150 ease-in-out border ${
                 errorText
                     ? "border-red-500 focus:ring-red-200 bg-red-50 text-red-900"
