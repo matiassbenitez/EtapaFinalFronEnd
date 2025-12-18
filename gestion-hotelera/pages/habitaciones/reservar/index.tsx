@@ -66,12 +66,13 @@ const MostrarEstadoHabitaciones = () => {
         setMostrarModalHuesped(true);
     };
 
-    const handleConfirmar = (huespedData: {
+    const handleConfirmar = async (huespedData: {
         nombre: string;
         apellido: string;
         contacto: string;
     }) => {
-        for (const reservaPendiente of listaReservas) {
+        const promesas = listaReservas.map((reservaPendiente) => {
+        //for (const reservaPendiente of listaReservas) {
             const reservaCompleta: ReservaData = {
                 huespedesIds: [],
                 habitacionesIds: [reservaPendiente.habitacionId],
@@ -82,9 +83,10 @@ const MostrarEstadoHabitaciones = () => {
                 contacto: huespedData.contacto,
             };
             console.log("reservaCompleta enviada: ", reservaCompleta);
-            enviarReservasAlServidor(reservaCompleta);
-        }
-        fetchHabitaciones();
+            return enviarReservasAlServidor(reservaCompleta);
+        });
+        await Promise.all(promesas);
+        await fetchHabitaciones();
         setMostrarModalHuesped(false);
         setListaReservas([]);
     };
